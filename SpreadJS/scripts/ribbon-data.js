@@ -354,7 +354,7 @@ var data = {
                         }
                     ]
                 },
-                {
+                /*{
                     "tools": [
                         {
                             "type": "icon",
@@ -374,7 +374,7 @@ var data = {
                             "checked": true
                         }
                     ]
-                },
+                },*/
                 {
                     "tools": [
                         {

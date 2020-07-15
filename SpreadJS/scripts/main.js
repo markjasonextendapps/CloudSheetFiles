@@ -31,7 +31,7 @@ accountId = jQuery.urlParam('accountId');
 
 isFullscreen = jQuery.urlParam('fullscreen') === 'T';
 let styleElement = document.createElement('style');
-    styleElement.type = 'text/css';
+styleElement.type = 'text/css';
 if(isFullscreen){
     styleElement.innerHTML = "html, body {margin: 0; height: 100%; width: 100%; border-width: 0; padding: 0;}";
 }else{
@@ -1800,7 +1800,7 @@ function refreshAllSavedSearch(){
 
 function setName(sheet, sheetTitle){
 
-    var modifiedTitle = sheetTitle.substring(0, 30);
+    var modifiedTitle = sheetTitle.replace(/:\s*/g, "").substring(0, 30);
     if(spread.getSheetFromName(modifiedTitle)){
         modifiedTitle = 'Sheet'+spread.getSheetCount() +'-' +modifiedTitle;
         modifiedTitle = modifiedTitle.substring(0, 30);
@@ -1878,64 +1878,64 @@ function paintSheetData(data, newSheet){
             new GC.Spread.Sheets.LineBorder("rgb(0,0,0)", GC.Spread.Sheets.LineStyle.dashed),
             { top: true, bottom: true, right: true, left: true }
         );
-   sheet.options.isProtected = true;
-     /*sheet.getRange(0,0, data.result.length+1000).locked(false);
-    sheet.getRange(0,1, 0, Math.max(columnCount,2)).locked(false);
-    sheet.getRange(5+data.result.length,1, 5+data.result.length+1000, Math.max(columnCount,2)).locked(false);
-    sheet.getRange(0,1+Math.max(columnCount,2), data.result.length+1000, data.columns.length+200).locked(false);*/
+    sheet.options.isProtected = true;
+    /*sheet.getRange(0,0, data.result.length+1000).locked(false);
+   sheet.getRange(0,1, 0, Math.max(columnCount,2)).locked(false);
+   sheet.getRange(5+data.result.length,1, 5+data.result.length+1000, Math.max(columnCount,2)).locked(false);
+   sheet.getRange(0,1+Math.max(columnCount,2), data.result.length+1000, data.columns.length+200).locked(false);*/
     sheet.resumePaint();
     return true;
 }
 
 function saveWorkbook( workbookName ){
     console.log('saveWorkbook', workbookName );
-        return new Promise(function(resolve,reject){
-            try {
-                var data =  spread.toJSON({includeBindingSource: true});
-                resolve(data);
-            }catch(err){
-                reject(err);
-            }
-        }).then( ssdata => {
-            const fetchData = { data:  ssdata };
-                fetchData.action = savedWorkbooktData ? ( workbookName ? 'saveNewWorkbook' : 'saveWorkbook' ) : 'saveNewWorkbook';
-            if(workbookName){
-                fetchData.name = workbookName;
-            }
-            if(savedWorkbooktData && !workbookName){
-                fetchData.id = savedWorkbooktData.id;
-            }
+    return new Promise(function(resolve,reject){
+        try {
+            var data =  spread.toJSON({includeBindingSource: true});
+            resolve(data);
+        }catch(err){
+            reject(err);
+        }
+    }).then( ssdata => {
+        const fetchData = { data:  ssdata };
+        fetchData.action = savedWorkbooktData ? ( workbookName ? 'saveNewWorkbook' : 'saveWorkbook' ) : 'saveNewWorkbook';
+        if(workbookName){
+            fetchData.name = workbookName;
+        }
+        if(savedWorkbooktData && !workbookName){
+            fetchData.id = savedWorkbooktData.id;
+        }
 
-            fetchData.savedsearch = [];
-            var share = [];
+        fetchData.savedsearch = [];
+        var share = [];
 
-            for (readWrite in readCombinedMultiSelect) {
-                share.push(readCombinedMultiSelect[readWrite]);
-            }
-            fetchData.share = share;
+        for (readWrite in readCombinedMultiSelect) {
+            share.push(readCombinedMultiSelect[readWrite]);
+        }
+        fetchData.share = share;
 
-            if(isUserWorkbookOwner){
-                /*
-                fetchData.share = [];
-                const readonlyValues = readonlyMultiSelect.value().map(v => +v);
-                const readwriteValues = readwriteMultiSelect.value().map(v => +v);
-                readonlyValues.forEach( value => {
-                    fetchData.share.push({
-                        id: value,
-                        type: 'readonly'
-                    });
+        if(isUserWorkbookOwner){
+            /*
+            fetchData.share = [];
+            const readonlyValues = readonlyMultiSelect.value().map(v => +v);
+            const readwriteValues = readwriteMultiSelect.value().map(v => +v);
+            readonlyValues.forEach( value => {
+                fetchData.share.push({
+                    id: value,
+                    type: 'readonly'
                 });
-                readwriteValues.forEach( value => {
-                    fetchData.share.push({
-                        id: value,
-                        type: 'readwrite'
-                    });
+            });
+            readwriteValues.forEach( value => {
+                fetchData.share.push({
+                    id: value,
+                    type: 'readwrite'
                 });
+            });
 
-                 */
-            }
-            return fetchData;
-        })
+             */
+        }
+        return fetchData;
+    })
         .then( fetchBody => {
             return fetch(mainSuiteletUrl,{
                 method: 'POST',
@@ -2003,8 +2003,8 @@ function deleteWorkbookBtnClicked(){
     if (confirmDelete == true) {
 
 
-    if(savedWorkbooktData){
-        deleteWorkbook()
+        if(savedWorkbooktData){
+            deleteWorkbook()
                 .then(fetchResponse=>{
                     return fetchResponse.json();
                 })
@@ -2019,15 +2019,15 @@ function deleteWorkbookBtnClicked(){
                     alert(error);
                 });
 
-    } else {
-        console.log('Nothing to delete');
-        alert('No workbook currently opened or saved.');
-    }
+        } else {
+            console.log('Nothing to delete');
+            alert('No workbook currently opened or saved.');
+        }
     }
 
 }
 
-    function getCellInfo(sheet, row, column) {
+function getCellInfo(sheet, row, column) {
     var result = {type: ""}, object;
     if ((object = sheet.comments.get(row, column))) {
         result.type = "comment";
@@ -8940,22 +8940,22 @@ function prepareSavedSearchBuilder($container) {
             showLoading();
         }
 
-         getSavedSearchResult(scriptid) .then( response => {
-                return response.json();
-         })
-         .then(data => {
-            if(data.error){
-                throw data.error;
-            } else {
-                paintSheetData(data, true);
-                hideLoading();
-            }
-         }).catch(error => {
+        getSavedSearchResult(scriptid) .then( response => {
+            return response.json();
+        })
+            .then(data => {
+                if(data.error){
+                    throw data.error;
+                } else {
+                    paintSheetData(data, true);
+                    hideLoading();
+                }
+            }).catch(error => {
             console.log('error', error);
             //hideProgress();
-         }).finally(() => {
-             hideLoading();
-         });
+        }).finally(() => {
+            hideLoading();
+        });
 
 
     }
