@@ -1878,11 +1878,11 @@ function paintSheetData(data, newSheet){
             new GC.Spread.Sheets.LineBorder("rgb(0,0,0)", GC.Spread.Sheets.LineStyle.dashed),
             { top: true, bottom: true, right: true, left: true }
         );
-    sheet.options.isProtected = true;
+    /*sheet.options.isProtected = true;
     sheet.getRange(0,0, data.result.length+1000).locked(false);
     sheet.getRange(0,1, 0, Math.max(columnCount,2)).locked(false);
     sheet.getRange(5+data.result.length,1, 5+data.result.length+1000, Math.max(columnCount,2)).locked(false);
-    sheet.getRange(0,1+Math.max(columnCount,2), data.result.length+1000, data.columns.length+200).locked(false);
+    sheet.getRange(0,1+Math.max(columnCount,2), data.result.length+1000, data.columns.length+200).locked(false);*/
     sheet.resumePaint();
     return true;
 }
