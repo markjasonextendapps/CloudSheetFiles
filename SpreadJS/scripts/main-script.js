@@ -1800,7 +1800,7 @@ function refreshAllSavedSearch(){
 
 function setName(sheet, sheetTitle){
 
-    var modifiedTitle = sheetTitle.substring(0, 30);
+    var modifiedTitle = sheetTitle.replace(/:\s*/g, "").substring(0, 30);
     if(spread.getSheetFromName(modifiedTitle)){
         modifiedTitle = 'Sheet'+spread.getSheetCount() +'-' +modifiedTitle;
         modifiedTitle = modifiedTitle.substring(0, 30);
