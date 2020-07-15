@@ -1877,7 +1877,7 @@ function paintSheetData(data, newSheet){
         .setBorder(
             new GC.Spread.Sheets.LineBorder("rgb(0,0,0)", GC.Spread.Sheets.LineStyle.dashed),
             { top: true, bottom: true, right: true, left: true }
-        ).locked(true);
+        );
    sheet.options.isProtected = true;
      /*sheet.getRange(0,0, data.result.length+1000).locked(false);
     sheet.getRange(0,1, 0, Math.max(columnCount,2)).locked(false);
