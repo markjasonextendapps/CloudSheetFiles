@@ -8950,57 +8950,14 @@ function prepareSavedSearchBuilder($container) {
                 paintSheetData(data, true);
                 hideLoading();
             }
+         }).catch(error => {
+            console.log('error', error);
+            //hideProgress();
+         }).finally(() => {
+             hideLoading();
          });
 
-           /*
-        for(let i=0; i<data.columns.length; i++){
-            let rangecode = `${objAtoZZ[i+1]}1`; //// +1 to skip id column
-            let header = sheet.range(rangecode).value();
-            let oldHeader = sheet.range(rangecode).value();
-            sheet.range(rangecode).value(data.columns[i].label); //// change header from fieldId to search column label
-            let charCount = data.columnWidth[oldHeader] > data.columns[i].label.length ? data.columnWidth[oldHeader] : data.columns[i].label.length;
-            sheet.columnWidth(i+1, (( charCount>100?100:charCount)*7)+10 ); //// set column width, change width limit multiplier here
-        }
-        sheet.range(`A1:${objAtoZZ[data.columns.length]}${data.result.length+1}`).enable(false); //// disable search result cells
-        const headerRangeCode = `A1:${objAtoZZ[data.columns.length]}1`;
-        sheet.range(headerRangeCode).background("#39729B"); //// set header background color
-        sheet.range(headerRangeCode).bold(true);
-        sheet.range(headerRangeCode).color("white");
-        sheet.range(headerRangeCode).textAlign("center");
 
-        //// URL
-        sheet.insertRow(0, true);
-        sheet.range(headerRangeCode).merge();
-        sheet.range('A1').value('Search URL');
-        sheet.range('A1').link(data.url.toLowerCase());
-        sheet.range(headerRangeCode).background("#39729B"); //// set header background color
-        sheet.range(headerRangeCode).bold(true);
-        sheet.range(headerRangeCode).color("white");
-
-        //// Date
-        let searchDate = new Date(data.date);
-        sheet.insertRow(0, true);
-        sheet.range(headerRangeCode).merge();
-        sheet.range('A1').value('Date: '+ searchDate.toLocaleDateString() + ' ' + searchDate.toLocaleTimeString() );
-        sheet.range(headerRangeCode).background("#39729B"); //// set header background color
-        sheet.range(headerRangeCode).bold(true);
-        sheet.range(headerRangeCode).color("white");
-
-        //// Title
-        sheet.insertRow(0, true);
-        sheet.range(headerRangeCode).merge();
-        sheet.range('A1').value(data.title);
-        sheet.range('A1').fontSize(16);
-        sheet.range(headerRangeCode).background("#39729B"); //// set header background color
-        sheet.range(headerRangeCode).bold(true);
-        sheet.range(headerRangeCode).color("white");
-        sheet.range(headerRangeCode).textAlign("left");
-
-        sheet.frozenRows(4);
-
-        return sheetDs;
-
-         */
     }
 
     function startEditWithFormula(sheet, rowIndex, colIndex, formula) {
