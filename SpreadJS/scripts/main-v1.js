@@ -1998,11 +1998,14 @@ function saveWorkbook( workbookName ){
                         jQuery('#popupModal').modal('show');
                     }
                 } else {
-                    console.log('new Workbook');
+                    console.log('new Workbook - ' + rjd.id);
                     savedWorkbooktData = {
                         id: rjd.id,
                         name: workbookName
                     };
+
+                    var url = document.location.href+"&workbookId="+rjd.id;
+                    document.location = url;
                 }
                 addSaveBtn();
                 if(workbookName) {
@@ -2027,6 +2030,7 @@ function saveWorkbook( workbookName ){
                     }).then(result => {
 
                 });
+
 
                 hideLoading();
 
@@ -5070,13 +5074,13 @@ function showSparklineSetting(row, col) {
             getCascadeSparklineSetting(formulaArgs, row, col);
             return true;
         }
-        // else if (formulaSparkline instanceof GC.Spread.Sheets.Sparklines.CompatibleSparkline) {
-        //     $("#compatibleSparklineSetting").show();
-        //     if (expr.fn.name) {
-        //         sparklineName = expr.fn.name;
-        //     }
-        //     getCompatibleSparklineSetting(formulaArgs, row, col);
-        //     return true;
+            // else if (formulaSparkline instanceof GC.Spread.Sheets.Sparklines.CompatibleSparkline) {
+            //     $("#compatibleSparklineSetting").show();
+            //     if (expr.fn.name) {
+            //         sparklineName = expr.fn.name;
+            //     }
+            //     getCompatibleSparklineSetting(formulaArgs, row, col);
+            //     return true;
         // }
         else if (formulaSparkline instanceof GC.Spread.Sheets.Sparklines.ScatterSparkline) {
             $("#scatterSparklineSetting").show();
