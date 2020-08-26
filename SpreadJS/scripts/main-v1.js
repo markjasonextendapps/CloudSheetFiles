@@ -1783,34 +1783,48 @@ function initSpread() { //jason
 
 function refreshSavedSearch(){
     var sheet = spread.getActiveSheet();
-    var name = sheet.getValue(1, 1);
+    var scriptid = sheet.getValue(0, 1);
 
-    var scriptid = savedSearchesListMap[name].id;
-    getSavedSearchResult(scriptid) .then( response => {
-        return response.json();
-    })
-        .then(data => {
-            if(data.error){
-                // testr
-                jQuery('#popupModalTitle').html(data.error);
-                jQuery('#popupModal').modal('show');
+    if(scriptid){
 
-            } else {
-                paintSheetData(data, false);
-            }
+        showLoading();
+        getSavedSearchResult(scriptid).then(response => {
+            return response.json();
+        })
+            .then(data => {
+                if (data.error) {
+                    // testr
+                    jQuery('#popupModalTitle').html(data.error);
+                    jQuery('#popupModal').modal('show');
+
+                } else {
+                    paintSheetData(data, false);
+                }
+            }).finally(() => {
+            hideLoading();
         });
+
+    }else{
+        // august 14
+        jQuery('#popupModalTitle').html('Unable to locate saved search ['+name+'] attached to this sheet.');
+        jQuery('#popupModal').modal('show');
+    }
 }
 
 function refreshAllSavedSearch(){
-
+    // showLoading();
     for(var i = 0; i < spread.getSheetCount(); i++) {
         try {
-            spread.setActiveSheetIndex(i);
-            var sheet = spread.getActiveSheet();
-            var name = sheet.getValue(1, 1);
 
-            if (savedSearchesListMap[name]) {
-                var scriptid = savedSearchesListMap[name].id;
+
+            setTimeout(function (){
+                // Something you want delayed.
+            }, 1000);
+
+            var sheet = spread.getSheet(i);
+            spread.setActiveSheetIndex(i);
+            var scriptid = sheet.getValue(0, 1);
+            if (scriptid) {
                 getSavedSearchResult(scriptid).then(response => {
                     return response.json();
                 })
@@ -1821,9 +1835,17 @@ function refreshAllSavedSearch(){
                             paintSheetData(data, false);
                         }
                     });
+                //}
+
+                /*else{
+                    // august 14
+                    jQuery('#popupModalTitle').html('Unable to locate saved search ['+name+'] attached to this sheet.');
+                    jQuery('#popupModal').modal('show');
+                }*/
             }
         }catch(e){}
     }
+    // hideLoading();
 }
 
 function setName(sheet, sheetTitle){
@@ -1839,32 +1861,37 @@ function setName(sheet, sheetTitle){
 }
 
 
-function paintSheetData(data, newSheet){
-    if(newSheet == true){
+function paintSheetData(data, newSheet) {
+    if (newSheet == true) {
         spread.addSheet();
-        spread.setActiveSheetIndex(+spread.getSheetCount()-1);
+        spread.setActiveSheetIndex(+spread.getSheetCount() - 1);
     }
 
     var sheet = spread.getActiveSheet();
-    if(newSheet == true) {
+    if (newSheet == true) {
         setName(sheet, data.title);
+    }else{
+        sheet.reset();
     }
-    sheet.suspendPaint();
-    sheet.setRowCount(1000+data.result.length, GC.Spread.Sheets.SheetArea.viewport);
-    sheet.setColumnCount(200+ data.columns.length, GC.Spread.Sheets.SheetArea.viewport);
-    // statusBar.bind(spread);
 
-    var columnCount = data.columns.length;
-    sheet.addSpan(1, 1, 1, Math.max(columnCount,2));
-    sheet.addSpan(2, 2, 1, Math.max(columnCount-1,1));
-    sheet.addSpan(3, 2, 1, Math.max(columnCount-1,1));
+    sheet.suspendPaint();
+    sheet.setRowCount(1000 + data.result.length, GC.Spread.Sheets.SheetArea.viewport);
+    sheet.setColumnCount(200 + data.columns.length, GC.Spread.Sheets.SheetArea.viewport);
+
+    var columnCount = data.columns.length || 0;
+    //if (newSheet == true) {
+    sheet.addSpan(1, 1, 1, Math.max(columnCount, 2));
+    sheet.addSpan(2, 2, 1, Math.max(columnCount - 1, 1));
+    sheet.addSpan(3, 2, 1, Math.max(columnCount - 1, 1));
     sheet.setRowHeight(1, 36);
+    // }
     sheet.setValue(1, 1, data.title);
     sheet.autoFitColumn(1);
     sheet.autoFitColumn(2);
     sheet.autoFitColumn(3);
 
     var border = new GC.Spread.Sheets.LineBorder("rgb(0,0,0)", 5);
+    sheet.getCell(0,1).foreColor("Background 1");
     sheet.getRange(1, 1, 1, Math.max(columnCount,2)).backColor("Accent 6 -50").foreColor("Background 1").hAlign(0).font("29.3333px Arial");
     sheet.getRange(2, 1, 1, Math.max(columnCount,2)).backColor("Accent 6 -50").foreColor("Background 1").hAlign(0).font("11px Arial");
     sheet.getRange(3, 1, 1, Math.max(columnCount,2)).borderBottom(border).backColor("Accent 6 -50").foreColor("Background 1").hAlign(0).font("11px Arial");
@@ -1880,6 +1907,9 @@ function paintSheetData(data, newSheet){
     cellLink.linkToolTip(data.title);
     sheet.setValue(3, 2, data.url);
     sheet.getCell(3, 2).cellType(cellLink).value(data.url);
+
+
+    sheet.setValue(0, 1, data.searchId);
 
 
 
@@ -7970,14 +8000,18 @@ function processRibbonClick(e, data) {
         case "refreshSavedSearch":
             var confirmNew = confirm("Are you sure you want to refresh this saved search?");
             if (confirmNew == true) {
+
                 refreshSavedSearch();
+
             }
             break;
 
         case "refreshAllSavedSearches":
             var confirmNew = confirm("Are you sure you want to refresh all saved searches?");
             if (confirmNew == true) {
-                refreshAllSavedSearch()
+                showLoading();
+                refreshAllSavedSearch();
+                hideLoading();
             }
             break;
 
@@ -9188,29 +9222,36 @@ function prepareSavedSearchBuilder($container) {
     }
 
     function addSavedSearchToSheet(name) {
-
+        console.log("" + name);
         var scriptid = savedSearchesListMap[name].id;
 
         if(+scriptid > 0){
             showLoading();
-        }
 
-        getSavedSearchResult(scriptid) .then( response => {
-            return response.json();
-        })
-            .then(data => {
-                if(data.error){
-                    throw data.error;
-                } else {
-                    paintSheetData(data, true);
-                    hideLoading();
-                }
-            }).catch(error => {
-            console.log('error', error);
-            //hideProgress();
-        }).finally(() => {
-            hideLoading();
-        });
+
+            getSavedSearchResult(scriptid) .then( response => {
+                return response.json();
+            })
+                .then(data => {
+                    if(data.error){
+                        throw data.error;
+                    } else {
+                        paintSheetData(data, true);
+                        hideLoading();
+                    }
+                }).catch(error => {
+                console.log('error', error);
+                //hideProgress();
+            }).finally(() => {
+                hideLoading();
+            });
+
+        }else{
+
+            // august 14
+            jQuery('#popupModalTitle').html('Unable to locate saved search ['+name+'] attached to this sheet.');
+            jQuery('#popupModal').modal('show');
+        }
 
 
     }
@@ -9240,7 +9281,8 @@ function prepareSavedSearchBuilder($container) {
         var $li = $("<li class='savedsearch-item'></li>");
         $li.attr('data-category', array.name);
         $li.text(funcName.name);
-        savedSearchesListMap[funcName.name] = {id: funcName.id, scriptid: funcName.scriptid};
+
+        savedSearchesListMap["" + funcName.name] = {id: funcName.id, scriptid: funcName.scriptid};
         return $li;
     }
 
@@ -9251,7 +9293,7 @@ function prepareSavedSearchBuilder($container) {
         var cat = savedSearchesList[name], text = cat.text, items = cat.items;
         var $li = $("<li class='savedsearch-category'></li>");
         $li.attr('data-name', name);
-        $li.text(text);
+        $li.text("" + text);
         $ul.append($li);
         items.name = name;  // used to provide addtional information for array operator later
         $ul.append(items.map(getFunctionItem));
@@ -9281,7 +9323,7 @@ function prepareSavedSearchBuilder($container) {
         var scriptid = savedSearchesListMap[name].scriptid;
         var html = 'Select a saved search that will be added to the sheet';
         if (name && name != "") {
-            html = `<input id='savedSearchToLoad' type='hidden' value='${name}'><div class='function-description-container'><strong>${name}</strong><br>${["[", scriptid, "]"].join("")}</div>`;
+            html = `<input id='savedSearchToLoad' type='hidden' value='${name}'><div class='function-description-container'><strong id="savedSearchToLoadText">${name}</strong><br>${["[", scriptid, "]"].join("")}</div>`;
         }else{
             html = "<div class='function-description-container'><strong>" + [name, "[", scriptid, "]"].join("") + "</strong></div> " ;
         }
@@ -9293,7 +9335,7 @@ function prepareSavedSearchBuilder($container) {
         var selected = jQuery(".savedsearch-item.selected");
         if(selected && selected.length > 0) {
             //var name = selected[0].innerText;
-            var name = jQuery("#savedSearchToLoad").val();
+            var name = jQuery("#savedSearchToLoadText").text();
             console.log('name xx:'+name);
 
             if(name != null && name != "") {
