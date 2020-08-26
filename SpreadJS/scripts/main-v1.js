@@ -1806,8 +1806,8 @@ function refreshSavedSearch(){
 
     }else{
         // august 14
-        jQuery('#popupModalTitle').html('Unable to locate saved search ['+name+'] attached to this sheet.');
-        jQuery('#popupModal').modal('show');
+        // jQuery('#popupModalTitle').html('Unable to locate saved search ['+name+'] attached to this sheet.');
+        // jQuery('#popupModal').modal('show');
     }
 }
 
