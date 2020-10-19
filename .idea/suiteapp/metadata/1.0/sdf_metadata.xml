@@ -122,6 +122,7 @@
 		<field name="appliestosubplan" type="boolean" default="F"/>
 		<field name="includechilditems" type="boolean" default="F"/>
 		<field name="itemmatrix" type="boolean" default="F" feature="MATRIXITEMS"/>
+		<field name="ismhitemattribute" type="boolean" default="F" feature="MERCHANDISEHIERARCHY"/>
 		<field name="items" type="list" multiple="true" accountspecific="ignore"/>
 		<field name="itemsubtype" type="list" values="itemcustomfield_itemsubtype"/>
 		<subrecordtypegroup name="customfieldfilters">
@@ -271,6 +272,12 @@
 				<field name="isdeployed" type="boolean" default="T"/>
 				<field name="loglevel" type="list" default="DEBUG" values="script_loglevel"/>
 				<field name="status" type="list" default="TESTING" values="script_status" mandatory="true"/>
+				<field name="executioncontext" type="list" values="execution_context" multiple="true"/>
+				<field name="localizationcontext" type="list" values="countries" multiple="true">
+					<availability>
+						<condition dependson="alllocalizationcontexts" operation="EQUALS" value="F"/>
+					</availability>
+				</field>
 				<field name="recordtype" type="list" refs="customrecordtype,customtransactiontype" values="scriptdeployment_recordtype,allrecord_script_deployment_recordtype" mandatory="true"/>
 				<customfield instancetype="clientscript.scriptcustomfields.scriptcustomfield" fromparentonly="true"/>
 			</subrecordtype>
@@ -384,6 +391,22 @@
 				<field name="scriptfile" type="filereference" accountspecific="conditional" allowedFileExtensions=".js" mandatory="true"/>
 			</subrecordtype>
 		</subrecordtypegroup>
+	</recordtype>
+	<recordtype name="bankstatementparserplugin">
+		<attribute name="scriptid" type="string" mandatory="true" length="40" default="customscript"/>
+		<field name="description" type="string" length="999"/>
+		<field name="isinactive" type="boolean" default="F"/>
+		<field name="name" type="string" length="40" mandatory="true"/>
+		<field name="notifyadmins" type="boolean" default="F"/>
+		<field name="notifyemails" type="string" length="999"/>
+		<field name="notifygroup" type="string" accountspecific="warn"/>
+		<field name="notifyowner" type="boolean" default="T"/>
+		<field name="notifyuser" type="boolean" default="F"/>
+		<field name="owner" type="string" accountspecific="ignore"/>
+		<field name="scriptfile" type="filereference" accountspecific="conditional" allowedFileExtensions=".js" mandatory="true"/>
+		<field name="loglevel" type="list" default="DEBUG" values="script_loglevel"/>
+		<field name="runasrole" type="list" refs="role" values="generic_role"/>
+		<field name="status" type="list" default="TESTING" values="script_status"/>
 	</recordtype>
 	<recordtype name="itemnumbercustomfield">
 		<attribute name="scriptid" type="string" mandatory="true" length="44" default="custitemnumber"/>
@@ -680,7 +703,7 @@
 		<attribute name="scriptid" type="string" mandatory="true" length="40" default="customworkflow"/>
 		<feature>WORKFLOW</feature>
 		<field name="description" type="string"/>
-		<field name="initcontexts" type="list" values="workflow_contexttype" multiple="true"/>
+		<field name="initcontexts" type="list" values="execution_context" multiple="true"/>
 		<field name="initeventtypes" type="list" values="workflow_eventtype" multiple="true"/>
 		<field name="initsavedsearchcondition" type="list" refs="savedsearch"/>
 		<field name="initsavedsearchfilter" type="list" refs="savedsearch"/>
@@ -689,7 +712,7 @@
 		<field name="initonvieworupdate" type="boolean" default="F"/>
 		<field name="isinactive" type="boolean" default="F"/>
 		<field name="islogenabled" type="boolean" default="F"/>
-		<field name="name" type="string" mandatory="true"/>
+		<field name="name" type="list" refs="translationcollection.strings.string" mandatory="true"/>
 		<field name="owner" type="string" accountspecific="ignore"/>
 		<field name="recordtypes" type="list" refs="customrecordtype,customtransactiontype" values="generic_standard_recordtype" multiple="true" mandatory="true"/>
 		<field name="releasestatus" type="list" default="NOTINITIATING" values="workflow_releasestatus"/>
@@ -747,7 +770,7 @@
 				<field name="donotexitworkflow" type="boolean" default="F"/>
 				<field name="positionx" type="integer"/>
 				<field name="positiony" type="integer"/>
-				<field name="name" type="string" mandatory="true"/>
+				<field name="name" type="list" refs="translationcollection.strings.string" mandatory="true"/>
 				<subrecordtypegroup name="workflowstatecustomfields">
 					<subrecordtype name="workflowstatecustomfield">
 						<attribute name="scriptid" type="string" mandatory="true" length="41" default="custwfstate"/>
@@ -798,7 +821,7 @@
 						<attribute name="scriptid" type="string" mandatory="true" length="40" default="workflowaction"/>
 						<feature>WORKFLOW</feature>
 						<field name="eventtypes" type="list" values="workflowaction_eventtype" multiple="true"/>
-						<field name="contexttypes" type="list" values="workflow_contexttype" multiple="true"/>
+						<field name="contexttypes" type="list" values="execution_context" multiple="true"/>
 						<field name="conditionsavedsearch" type="list" refs="savedsearch"/>
 						<field name="scheduledelay" type="integer"/>
 						<field name="scheduletimeofday" type="time">
@@ -814,7 +837,7 @@
 							<attribute name="scriptid" type="string" mandatory="true" length="40" default="workflowaction"/>
 							<feature>WORKFLOW</feature>
 							<field name="isinactive" type="boolean" default="F"/>
-							<field name="label" type="string" mandatory="true"/>
+							<field name="label" type="list" refs="translationcollection.strings.string" mandatory="true"/>
 							<field name="saverecordfirst" type="boolean" default="F"/>
 							<field name="checkconditionbeforeexecution" type="boolean" default="T"/>
 						</subrecordtype>
@@ -949,7 +972,7 @@
 							<attribute name="scriptid" type="string" mandatory="true" length="40" default="workflowaction"/>
 							<feature>WORKFLOW</feature>
 							<field name="isinactive" type="boolean" default="F"/>
-							<field name="errortext" type="string" mandatory="true"/>
+							<field name="errortext" type="list" refs="translationcollection.strings.string" mandatory="true"/>
 						</subrecordtype>
 						<subrecordtype name="sendcampaignemailaction">
 							<attribute name="scriptid" type="string" mandatory="true" length="40" default="workflowaction"/>
@@ -1116,7 +1139,7 @@
 						<attribute name="scriptid" type="string" mandatory="true" length="40" default="workflowaction"/>
 						<feature>WORKFLOW</feature>
 						<field name="eventtypes" type="list" values="workflowaction_eventtype" multiple="true"/>
-						<field name="contexttypes" type="list" values="workflow_contexttype" multiple="true"/>
+						<field name="contexttypes" type="list" values="execution_context" multiple="true"/>
 						<field name="conditionsavedsearch" type="list" refs="savedsearch"/>
 						<field name="scheduledelay" type="integer"/>
 						<field name="scheduletimeofday" type="time">
@@ -1165,7 +1188,7 @@
 							<feature>WORKFLOW</feature>
 							<field name="conditionsavedsearch" type="list" refs="savedsearch"/>
 							<field name="isinactive" type="boolean" default="F"/>
-							<field name="errortext" type="string" mandatory="true"/>
+							<field name="errortext" type="list" refs="translationcollection.strings.string" mandatory="true"/>
 							<fragment name="initcondition" type="WORKFLOW_CONDITION_BUILDER">
 								<field name="type" type="list" values="workflow_condition_type" mandatory="true"/>
 								<field name="formula" type="string"/>
@@ -1284,10 +1307,10 @@
 						<attribute name="scriptid" type="string" mandatory="true" length="40" default="workflowaction"/>
 						<feature>WORKFLOW</feature>
 						<field name="eventtypes" type="list" values="workflowaction_eventtype" multiple="true"/>
-						<field name="contexttypes" type="list" values="workflow_contexttype" multiple="true"/>
+						<field name="contexttypes" type="list" values="execution_context" multiple="true"/>
 						<field name="conditionsavedsearch" type="list" refs="savedsearch"/>
 						<field name="isinactive" type="boolean" default="F"/>
-						<field name="label" type="string" mandatory="true"/>
+						<field name="label" type="list" refs="translationcollection.strings.string" mandatory="true"/>
 						<field name="saverecordfirst" type="boolean" default="F"/>
 						<field name="checkconditionbeforeexecution" type="boolean" default="T"/>
 						<fragment name="initcondition" type="WORKFLOW_CONDITION_BUILDER">
@@ -1305,11 +1328,24 @@
 					<subrecordtype name="confirmaction">
 						<attribute name="scriptid" type="string" mandatory="true" length="40" default="workflowaction"/>
 						<feature>WORKFLOW</feature>
+						<field name="clienttriggerfieldsissublistfield" type="boolean" default="F">
+							<availability>
+								<condition dependson=".triggertype" operation="IN" value="workflowaction_triggertype_client"/>
+							</availability>
+						</field>
+						<field name="clienttriggerfieldssublist" type="list" default="item" values="workflow_sublists">
+							<mandatoriness>
+								<condition dependson=".clienttriggerfieldsissublistfield" operation="EQUALS" value="T"/>
+							</mandatoriness>
+							<availability>
+								<condition dependson=".clienttriggerfieldsissublistfield" operation="EQUALS" value="T"/>
+							</availability>
+						</field>
 						<field name="clienttriggerfields" type="list" refs="crmcustomfield,customrecordtype.customrecordcustomfields.customrecordcustomfield,entitycustomfield,itemcustomfield,itemnumbercustomfield,itemoptioncustomfield,othercustomfield,transactionbodycustomfield,transactioncolumncustomfield,workflow.workflowcustomfields.workflowcustomfield,workflow.workflowstates.workflowstate.workflowstatecustomfields.workflowstatecustomfield" values="generic_standard_field" multiple="true"/>
-						<field name="contexttypes" type="list" values="workflow_contexttype" multiple="true"/>
+						<field name="contexttypes" type="list" values="execution_context" multiple="true"/>
 						<field name="conditionsavedsearch" type="list" refs="savedsearch"/>
 						<field name="isinactive" type="boolean" default="F"/>
-						<field name="messagetext" type="string" mandatory="true"/>
+						<field name="messagetext" type="list" refs="translationcollection.strings.string" mandatory="true"/>
 						<fragment name="initcondition" type="WORKFLOW_CONDITION_BUILDER">
 							<field name="type" type="list" values="workflow_condition_type" mandatory="true"/>
 							<field name="formula" type="string"/>
@@ -1326,7 +1362,7 @@
 						<attribute name="scriptid" type="string" mandatory="true" length="40" default="workflowaction"/>
 						<feature>WORKFLOW</feature>
 						<field name="eventtypes" type="list" values="workflowaction_eventtype" multiple="true"/>
-						<field name="contexttypes" type="list" values="workflow_contexttype" multiple="true"/>
+						<field name="contexttypes" type="list" values="execution_context" multiple="true"/>
 						<field name="conditionsavedsearch" type="list" refs="savedsearch"/>
 						<field name="isinactive" type="boolean" default="F"/>
 						<field name="sublist" type="list" default="item" values="workflow_sublists" mandatory="true"/>
@@ -1359,7 +1395,7 @@
 						<attribute name="scriptid" type="string" mandatory="true" length="40" default="workflowaction"/>
 						<feature>WORKFLOW</feature>
 						<field name="eventtypes" type="list" values="workflowaction_eventtype" multiple="true"/>
-						<field name="contexttypes" type="list" values="workflow_contexttype" multiple="true"/>
+						<field name="contexttypes" type="list" values="execution_context" multiple="true"/>
 						<field name="conditionsavedsearch" type="list" refs="savedsearch"/>
 						<field name="scheduledelay" type="integer"/>
 						<field name="scheduletimeofday" type="time"/>
@@ -1397,7 +1433,7 @@
 						<attribute name="scriptid" type="string" mandatory="true" length="40" default="workflowaction"/>
 						<feature>WORKFLOW</feature>
 						<field name="eventtypes" type="list" values="workflowaction_eventtype" multiple="true"/>
-						<field name="contexttypes" type="list" values="workflow_contexttype" multiple="true"/>
+						<field name="contexttypes" type="list" values="execution_context" multiple="true"/>
 						<field name="conditionsavedsearch" type="list" refs="savedsearch"/>
 						<field name="scheduledelay" type="integer"/>
 						<field name="scheduletimeofday" type="time"/>
@@ -1435,7 +1471,7 @@
 						<attribute name="scriptid" type="string" mandatory="true" length="40" default="workflowaction"/>
 						<feature>WORKFLOW</feature>
 						<field name="eventtypes" type="list" values="workflowaction_eventtype" multiple="true"/>
-						<field name="contexttypes" type="list" values="workflow_contexttype" multiple="true"/>
+						<field name="contexttypes" type="list" values="execution_context" multiple="true"/>
 						<field name="conditionsavedsearch" type="list" refs="savedsearch"/>
 						<field name="scheduledelay" type="integer"/>
 						<field name="scheduletimeofday" type="time"/>
@@ -1472,7 +1508,7 @@
 						<attribute name="scriptid" type="string" mandatory="true" length="40" default="workflowaction"/>
 						<feature>WORKFLOW</feature>
 						<field name="eventtypes" type="list" values="workflowaction_eventtype" multiple="true"/>
-						<field name="contexttypes" type="list" values="workflow_contexttype" multiple="true"/>
+						<field name="contexttypes" type="list" values="execution_context" multiple="true"/>
 						<field name="conditionsavedsearch" type="list" refs="savedsearch"/>
 						<field name="isinactive" type="boolean" default="F"/>
 						<fragment name="initcondition" type="WORKFLOW_CONDITION_BUILDER">
@@ -1491,7 +1527,7 @@
 						<attribute name="scriptid" type="string" mandatory="true" length="40" default="workflowaction"/>
 						<feature>WORKFLOW</feature>
 						<field name="eventtypes" type="list" values="workflowaction_eventtype" multiple="true"/>
-						<field name="contexttypes" type="list" values="workflow_contexttype" multiple="true"/>
+						<field name="contexttypes" type="list" values="execution_context" multiple="true"/>
 						<field name="conditionsavedsearch" type="list" refs="savedsearch"/>
 						<field name="isinactive" type="boolean" default="F"/>
 						<field name="targetpage" type="list" values="generic_standard_task">
@@ -1525,7 +1561,7 @@
 						<attribute name="scriptid" type="string" mandatory="true" length="40" default="workflowaction"/>
 						<feature>WORKFLOW</feature>
 						<field name="eventtypes" type="list" values="workflowaction_eventtype" multiple="true"/>
-						<field name="contexttypes" type="list" values="workflow_contexttype" multiple="true"/>
+						<field name="contexttypes" type="list" values="execution_context" multiple="true"/>
 						<field name="conditionsavedsearch" type="list" refs="savedsearch"/>
 						<field name="isinactive" type="boolean" default="F"/>
 						<field name="recordtype" type="list" refs="customrecordtype,customtransactiontype" values="generic_standard_recordtype" mandatory="true"/>
@@ -1560,7 +1596,7 @@
 						<attribute name="scriptid" type="string" mandatory="true" length="40" default="workflowaction"/>
 						<feature>WORKFLOW</feature>
 						<field name="eventtypes" type="list" values="workflowaction_eventtype" multiple="true"/>
-						<field name="contexttypes" type="list" values="workflow_contexttype" multiple="true"/>
+						<field name="contexttypes" type="list" values="execution_context" multiple="true"/>
 						<field name="conditionsavedsearch" type="list" refs="savedsearch"/>
 						<field name="isinactive" type="boolean" default="F"/>
 						<field name="buttonid" type="list" values="workflowaction_buttonid" mandatory="true"/>
@@ -1579,12 +1615,25 @@
 					<subrecordtype name="returnusererroraction">
 						<attribute name="scriptid" type="string" mandatory="true" length="40" default="workflowaction"/>
 						<feature>WORKFLOW</feature>
+						<field name="clienttriggerfieldsissublistfield" type="boolean" default="F">
+							<availability>
+								<condition dependson=".triggertype" operation="IN" value="workflowaction_triggertype_client"/>
+							</availability>
+						</field>
+						<field name="clienttriggerfieldssublist" type="list" default="item" values="workflow_sublists">
+							<mandatoriness>
+								<condition dependson=".clienttriggerfieldsissublistfield" operation="EQUALS" value="T"/>
+							</mandatoriness>
+							<availability>
+								<condition dependson=".clienttriggerfieldsissublistfield" operation="EQUALS" value="T"/>
+							</availability>
+						</field>
 						<field name="clienttriggerfields" type="list" refs="crmcustomfield,customrecordtype.customrecordcustomfields.customrecordcustomfield,entitycustomfield,itemcustomfield,itemnumbercustomfield,itemoptioncustomfield,othercustomfield,transactionbodycustomfield,transactioncolumncustomfield,workflow.workflowcustomfields.workflowcustomfield,workflow.workflowstates.workflowstate.workflowstatecustomfields.workflowstatecustomfield" values="generic_standard_field" multiple="true"/>
 						<field name="eventtypes" type="list" values="workflowaction_eventtype" multiple="true"/>
-						<field name="contexttypes" type="list" values="workflow_contexttype" multiple="true"/>
+						<field name="contexttypes" type="list" values="execution_context" multiple="true"/>
 						<field name="conditionsavedsearch" type="list" refs="savedsearch"/>
 						<field name="isinactive" type="boolean" default="F"/>
-						<field name="errortext" type="string" mandatory="true"/>
+						<field name="errortext" type="list" refs="translationcollection.strings.string" mandatory="true"/>
 						<fragment name="initcondition" type="WORKFLOW_CONDITION_BUILDER">
 							<field name="type" type="list" values="workflow_condition_type" mandatory="true"/>
 							<field name="formula" type="string"/>
@@ -1601,7 +1650,7 @@
 						<attribute name="scriptid" type="string" mandatory="true" length="40" default="workflowaction"/>
 						<feature>WORKFLOW</feature>
 						<field name="eventtypes" type="list" values="workflowaction_eventtype" multiple="true"/>
-						<field name="contexttypes" type="list" values="workflow_contexttype" multiple="true"/>
+						<field name="contexttypes" type="list" values="execution_context" multiple="true"/>
 						<field name="conditionsavedsearch" type="list" refs="savedsearch"/>
 						<field name="scheduledelay" type="integer"/>
 						<field name="scheduletimeofday" type="time"/>
@@ -1630,7 +1679,7 @@
 						<attribute name="scriptid" type="string" mandatory="true" length="40" default="workflowaction"/>
 						<feature>WORKFLOW</feature>
 						<field name="eventtypes" type="list" values="workflowaction_eventtype" multiple="true"/>
-						<field name="contexttypes" type="list" values="workflow_contexttype" multiple="true"/>
+						<field name="contexttypes" type="list" values="execution_context" multiple="true"/>
 						<field name="conditionsavedsearch" type="list" refs="savedsearch"/>
 						<field name="scheduledelay" type="integer"/>
 						<field name="scheduletimeofday" type="time"/>
@@ -1699,9 +1748,22 @@
 					<subrecordtype name="setdisplaylabelaction">
 						<attribute name="scriptid" type="string" mandatory="true" length="40" default="workflowaction"/>
 						<feature>WORKFLOW</feature>
+						<field name="clienttriggerfieldsissublistfield" type="boolean" default="F">
+							<availability>
+								<condition dependson=".triggertype" operation="IN" value="workflowaction_triggertype_client"/>
+							</availability>
+						</field>
+						<field name="clienttriggerfieldssublist" type="list" default="item" values="workflow_sublists">
+							<mandatoriness>
+								<condition dependson=".clienttriggerfieldsissublistfield" operation="EQUALS" value="T"/>
+							</mandatoriness>
+							<availability>
+								<condition dependson=".clienttriggerfieldsissublistfield" operation="EQUALS" value="T"/>
+							</availability>
+						</field>
 						<field name="clienttriggerfields" type="list" refs="crmcustomfield,customrecordtype.customrecordcustomfields.customrecordcustomfield,entitycustomfield,itemcustomfield,itemnumbercustomfield,itemoptioncustomfield,othercustomfield,transactionbodycustomfield,transactioncolumncustomfield,workflow.workflowcustomfields.workflowcustomfield,workflow.workflowstates.workflowstate.workflowstatecustomfields.workflowstatecustomfield" values="generic_standard_field" multiple="true"/>
 						<field name="eventtypes" type="list" values="workflowaction_eventtype" multiple="true"/>
-						<field name="contexttypes" type="list" values="workflow_contexttype" multiple="true"/>
+						<field name="contexttypes" type="list" values="execution_context" multiple="true"/>
 						<field name="conditionsavedsearch" type="list" refs="savedsearch"/>
 						<field name="field" type="list" refs="crmcustomfield,customrecordtype.customrecordcustomfields.customrecordcustomfield,entitycustomfield,itemcustomfield,itemnumbercustomfield,itemoptioncustomfield,othercustomfield,transactionbodycustomfield,transactioncolumncustomfield,workflow.workflowcustomfields.workflowcustomfield,workflow.workflowstates.workflowstate.workflowstatecustomfields.workflowstatecustomfield" values="generic_standard_field"/>
 						<field name="isinactive" type="boolean" default="F"/>
@@ -1730,9 +1792,22 @@
 					<subrecordtype name="setdisplaytypeaction">
 						<attribute name="scriptid" type="string" mandatory="true" length="40" default="workflowaction"/>
 						<feature>WORKFLOW</feature>
+						<field name="clienttriggerfieldsissublistfield" type="boolean" default="F">
+							<availability>
+								<condition dependson=".triggertype" operation="IN" value="workflowaction_triggertype_client"/>
+							</availability>
+						</field>
+						<field name="clienttriggerfieldssublist" type="list" default="item" values="workflow_sublists">
+							<mandatoriness>
+								<condition dependson=".clienttriggerfieldsissublistfield" operation="EQUALS" value="T"/>
+							</mandatoriness>
+							<availability>
+								<condition dependson=".clienttriggerfieldsissublistfield" operation="EQUALS" value="T"/>
+							</availability>
+						</field>
 						<field name="clienttriggerfields" type="list" refs="crmcustomfield,customrecordtype.customrecordcustomfields.customrecordcustomfield,entitycustomfield,itemcustomfield,itemnumbercustomfield,itemoptioncustomfield,othercustomfield,transactionbodycustomfield,transactioncolumncustomfield,workflow.workflowcustomfields.workflowcustomfield,workflow.workflowstates.workflowstate.workflowstatecustomfields.workflowstatecustomfield" values="generic_standard_field" multiple="true"/>
 						<field name="eventtypes" type="list" values="workflowaction_eventtype" multiple="true"/>
-						<field name="contexttypes" type="list" values="workflow_contexttype" multiple="true"/>
+						<field name="contexttypes" type="list" values="execution_context" multiple="true"/>
 						<field name="conditionsavedsearch" type="list" refs="savedsearch"/>
 						<field name="field" type="list" refs="crmcustomfield,customrecordtype.customrecordcustomfields.customrecordcustomfield,entitycustomfield,itemcustomfield,itemnumbercustomfield,itemoptioncustomfield,othercustomfield,transactionbodycustomfield,transactioncolumncustomfield,workflow.workflowcustomfields.workflowcustomfield,workflow.workflowstates.workflowstate.workflowstatecustomfields.workflowstatecustomfield" values="generic_standard_field"/>
 						<field name="isinactive" type="boolean" default="F"/>
@@ -1761,9 +1836,22 @@
 					<subrecordtype name="setfieldmandatoryaction">
 						<attribute name="scriptid" type="string" mandatory="true" length="40" default="workflowaction"/>
 						<feature>WORKFLOW</feature>
+						<field name="clienttriggerfieldsissublistfield" type="boolean" default="F">
+							<availability>
+								<condition dependson=".triggertype" operation="IN" value="workflowaction_triggertype_client"/>
+							</availability>
+						</field>
+						<field name="clienttriggerfieldssublist" type="list" default="item" values="workflow_sublists">
+							<mandatoriness>
+								<condition dependson=".clienttriggerfieldsissublistfield" operation="EQUALS" value="T"/>
+							</mandatoriness>
+							<availability>
+								<condition dependson=".clienttriggerfieldsissublistfield" operation="EQUALS" value="T"/>
+							</availability>
+						</field>
 						<field name="clienttriggerfields" type="list" refs="crmcustomfield,customrecordtype.customrecordcustomfields.customrecordcustomfield,entitycustomfield,itemcustomfield,itemnumbercustomfield,itemoptioncustomfield,othercustomfield,transactionbodycustomfield,transactioncolumncustomfield,workflow.workflowcustomfields.workflowcustomfield,workflow.workflowstates.workflowstate.workflowstatecustomfields.workflowstatecustomfield" values="generic_standard_field" multiple="true"/>
 						<field name="eventtypes" type="list" values="workflowaction_eventtype" multiple="true"/>
-						<field name="contexttypes" type="list" values="workflow_contexttype" multiple="true"/>
+						<field name="contexttypes" type="list" values="execution_context" multiple="true"/>
 						<field name="conditionsavedsearch" type="list" refs="savedsearch"/>
 						<field name="field" type="list" refs="crmcustomfield,customrecordtype.customrecordcustomfields.customrecordcustomfield,entitycustomfield,itemcustomfield,itemnumbercustomfield,itemoptioncustomfield,othercustomfield,transactionbodycustomfield,transactioncolumncustomfield,workflow.workflowcustomfields.workflowcustomfield,workflow.workflowstates.workflowstate.workflowstatecustomfields.workflowstatecustomfield" values="generic_standard_field"/>
 						<field name="isinactive" type="boolean" default="F"/>
@@ -1792,9 +1880,22 @@
 					<subrecordtype name="setfieldvalueaction">
 						<attribute name="scriptid" type="string" mandatory="true" length="40" default="workflowaction"/>
 						<feature>WORKFLOW</feature>
+						<field name="clienttriggerfieldsissublistfield" type="boolean" default="F">
+							<availability>
+								<condition dependson=".triggertype" operation="IN" value="workflowaction_triggertype_client"/>
+							</availability>
+						</field>
+						<field name="clienttriggerfieldssublist" type="list" default="item" values="workflow_sublists">
+							<mandatoriness>
+								<condition dependson=".clienttriggerfieldsissublistfield" operation="EQUALS" value="T"/>
+							</mandatoriness>
+							<availability>
+								<condition dependson=".clienttriggerfieldsissublistfield" operation="EQUALS" value="T"/>
+							</availability>
+						</field>
 						<field name="clienttriggerfields" type="list" refs="crmcustomfield,customrecordtype.customrecordcustomfields.customrecordcustomfield,entitycustomfield,itemcustomfield,itemnumbercustomfield,itemoptioncustomfield,othercustomfield,transactionbodycustomfield,transactioncolumncustomfield,workflow.workflowcustomfields.workflowcustomfield,workflow.workflowstates.workflowstate.workflowstatecustomfields.workflowstatecustomfield" values="generic_standard_field" multiple="true"/>
 						<field name="eventtypes" type="list" values="workflowaction_eventtype" multiple="true"/>
-						<field name="contexttypes" type="list" values="workflow_contexttype" multiple="true"/>
+						<field name="contexttypes" type="list" values="execution_context" multiple="true"/>
 						<field name="conditionsavedsearch" type="list" refs="savedsearch"/>
 						<field name="scheduledelay" type="integer"/>
 						<field name="scheduletimeofday" type="time"/>
@@ -1827,11 +1928,24 @@
 					<subrecordtype name="showmessageaction">
 						<attribute name="scriptid" type="string" mandatory="true" length="40" default="workflowaction"/>
 						<feature>WORKFLOW</feature>
+						<field name="clienttriggerfieldsissublistfield" type="boolean" default="F">
+							<availability>
+								<condition dependson=".triggertype" operation="IN" value="workflowaction_triggertype_client"/>
+							</availability>
+						</field>
+						<field name="clienttriggerfieldssublist" type="list" default="item" values="workflow_sublists">
+							<mandatoriness>
+								<condition dependson=".clienttriggerfieldsissublistfield" operation="EQUALS" value="T"/>
+							</mandatoriness>
+							<availability>
+								<condition dependson=".clienttriggerfieldsissublistfield" operation="EQUALS" value="T"/>
+							</availability>
+						</field>
 						<field name="clienttriggerfields" type="list" refs="crmcustomfield,customrecordtype.customrecordcustomfields.customrecordcustomfield,entitycustomfield,itemcustomfield,itemnumbercustomfield,itemoptioncustomfield,othercustomfield,transactionbodycustomfield,transactioncolumncustomfield,workflow.workflowcustomfields.workflowcustomfield,workflow.workflowstates.workflowstate.workflowstatecustomfields.workflowstatecustomfield" values="generic_standard_field" multiple="true"/>
-						<field name="contexttypes" type="list" values="workflow_contexttype" multiple="true"/>
+						<field name="contexttypes" type="list" values="execution_context" multiple="true"/>
 						<field name="conditionsavedsearch" type="list" refs="savedsearch"/>
 						<field name="isinactive" type="boolean" default="F"/>
-						<field name="messagetext" type="string" mandatory="true"/>
+						<field name="messagetext" type="list" refs="translationcollection.strings.string" mandatory="true"/>
 						<fragment name="initcondition" type="WORKFLOW_CONDITION_BUILDER">
 							<field name="type" type="list" values="workflow_condition_type" mandatory="true"/>
 							<field name="formula" type="string"/>
@@ -1848,7 +1962,7 @@
 						<attribute name="scriptid" type="string" mandatory="true" length="40" default="workflowaction"/>
 						<feature>WORKFLOW</feature>
 						<field name="eventtypes" type="list" values="workflowaction_eventtype" multiple="true"/>
-						<field name="contexttypes" type="list" values="workflow_contexttype" multiple="true"/>
+						<field name="contexttypes" type="list" values="execution_context" multiple="true"/>
 						<field name="conditionsavedsearch" type="list" refs="savedsearch"/>
 						<field name="scheduledelay" type="integer"/>
 						<field name="scheduletimeofday" type="time"/>
@@ -1873,7 +1987,7 @@
 						<attribute name="scriptid" type="string" mandatory="true" length="40" default="workflowaction"/>
 						<feature>WORKFLOW</feature>
 						<field name="eventtypes" type="list" values="workflowaction_eventtype" multiple="true"/>
-						<field name="contexttypes" type="list" values="workflow_contexttype" multiple="true"/>
+						<field name="contexttypes" type="list" values="execution_context" multiple="true"/>
 						<field name="conditionsavedsearch" type="list" refs="savedsearch"/>
 						<field name="scheduledelay" type="integer"/>
 						<field name="scheduletimeofday" type="time"/>
@@ -1913,7 +2027,7 @@
 						<attribute name="scriptid" type="string" mandatory="true" length="40" default="workflowtransition"/>
 						<feature>WORKFLOW</feature>
 						<field name="eventtypes" type="list" values="workflowaction_eventtype" multiple="true"/>
-						<field name="contexttypes" type="list" values="workflow_contexttype" multiple="true"/>
+						<field name="contexttypes" type="list" values="execution_context" multiple="true"/>
 						<field name="conditionsavedsearch" type="list" refs="savedsearch"/>
 						<field name="tostate" type="list" refs="workflow.workflowstates.workflowstate" mandatory="true"/>
 						<field name="triggertype" type="list" values="workflowtransition_triggertype"/>
@@ -2555,6 +2669,7 @@
 		<field name="bodystore" type="boolean" default="F" feature="WEBSTORE"/>
 		<field name="bodytransferorder" type="boolean" default="F" feature="MULTILOCINVT"/>
 		<field name="bodyvendorpayment" type="boolean" default="F" feature="PAYABLES"/>
+		<field name="bodybtegata" type="boolean" default="F" feature="ACCOUNTING"/>
 		<field name="fldsizelabel" type="string"/>
 		<field name="bodycustomtransactions" type="list" feature="CUSTOMTRANSACTIONS" refs="customtransactiontype" multiple="true"/>
 		<subrecordtypegroup name="customfieldfilters">
@@ -3664,7 +3779,7 @@
 		<field name="restrictbydevice" type="boolean" default="F"/>
 		<subrecordtypegroup name="permissions">
 			<subrecordtype name="permission">
-				<field name="permkey" type="list" refs="customrecordtype,customsegment" values="generic_permission" mandatory="true"/>
+				<field name="permkey" type="list" refs="customrecordtype,customsegment,customtransactiontype" values="generic_permission" mandatory="true"/>
 				<field name="permlevel" type="list" values="generic_permission_level" mandatory="true"/>
 				<field name="restriction" type="list" values="role_restrict"/>
 			</subrecordtype>
@@ -3781,7 +3896,7 @@
 				</fragment>
 				<fragment name="subItems" type="COLLECTION">
 					<fragment name="subList" type="DEFAULT">
-						<field name="id" type="list" refs="customrecordtype.customrecordcustomfields.customrecordcustomfield,customrecordtype.recordsublists.recordsublist" values="entryform_sublistid" mandatory="true"/>
+						<field name="id" type="list" refs="crmcustomfield,customrecordtype.customrecordcustomfields.customrecordcustomfield,customrecordtype.recordsublists.recordsublist,entitycustomfield,itemcustomfield,transactionbodycustomfield" values="entryform_sublistid" mandatory="true"/>
 						<field name="label" type="string" mandatory="true"/>
 						<field name="visible" type="boolean" default="T"/>
 					</fragment>
@@ -3831,7 +3946,7 @@
 					</fragment>
 					<fragment name="subLists" type="COLLECTION">
 						<fragment name="subList" type="DEFAULT">
-							<field name="id" type="list" refs="customrecordtype.customrecordcustomfields.customrecordcustomfield,customrecordtype.recordsublists.recordsublist" values="entryform_sublistid" mandatory="true"/>
+							<field name="id" type="list" refs="crmcustomfield,customrecordtype.customrecordcustomfields.customrecordcustomfield,customrecordtype.recordsublists.recordsublist,entitycustomfield,itemcustomfield,transactionbodycustomfield" values="entryform_sublistid" mandatory="true"/>
 							<field name="label" type="string" mandatory="true"/>
 							<field name="visible" type="boolean" default="T"/>
 						</fragment>
@@ -3839,13 +3954,16 @@
 				</fragment>
 			</fragment>
 		</fragment>
+		<fragment name="customCode" type="DEFAULT">
+			<field name="scriptFile" type="filereference" accountspecific="conditional" allowedFileExtensions=".js"/>
+		</fragment>
 		<fragment name="quickViewFields" type="COLLECTION">
 			<fragment name="field" type="DEFAULT">
 				<field name="id" type="list" refs="crmcustomfield,customrecordtype.customrecordcustomfields.customrecordcustomfield,entitycustomfield,itemcustomfield,itemnumbercustomfield,itemoptioncustomfield,othercustomfield,transactionbodycustomfield,transactioncolumncustomfield" values="entryform_fieldid" mandatory="true"/>
 			</fragment>
 		</fragment>
 		<fragment name="buttons" type="DEFAULT">
-			<fragment name="standardButtons" type="DEFAULT">
+			<fragment name="standardButtons" type="COLLECTION">
 				<fragment name="button" type="DEFAULT">
 					<field name="id" type="list" values="entryform_buttonid" mandatory="true"/>
 					<field name="label" type="string"/>
@@ -3862,6 +3980,12 @@
 					<field name="visible" type="boolean" default="T"/>
 				</fragment>
 			</fragment>
+			<fragment name="customButtons" type="COLLECTION">
+				<fragment name="customButton" type="DEFAULT">
+					<field name="label" type="string" length="99" mandatory="true"/>
+					<field name="function" type="string" length="200"/>
+				</fragment>
+			</fragment>
 			<fragment name="menu" type="COLLECTION">
 				<fragment name="menuitem" type="DEFAULT">
 					<field name="id" type="list" values="entryform_buttonid" mandatory="true"/>
@@ -3869,7 +3993,29 @@
 					<field name="visible" type="boolean" default="T"/>
 				</fragment>
 			</fragment>
+			<fragment name="customMenu" type="COLLECTION">
+				<fragment name="customMenuItem" type="DEFAULT">
+					<field name="label" type="string" length="99" mandatory="true"/>
+					<field name="function" type="string" length="200"/>
+				</fragment>
+			</fragment>
 		</fragment>
+	</recordtype>
+	<recordtype name="ficonnectivityplugin">
+		<attribute name="scriptid" type="string" mandatory="true" length="40" default="customscript"/>
+		<field name="description" type="string" length="999"/>
+		<field name="isinactive" type="boolean" default="F"/>
+		<field name="name" type="string" length="40" mandatory="true"/>
+		<field name="notifyadmins" type="boolean" default="F"/>
+		<field name="notifyemails" type="string" length="999"/>
+		<field name="notifygroup" type="string" accountspecific="warn"/>
+		<field name="notifyowner" type="boolean" default="T"/>
+		<field name="notifyuser" type="boolean" default="F"/>
+		<field name="owner" type="string" accountspecific="ignore"/>
+		<field name="scriptfile" type="filereference" accountspecific="conditional" allowedFileExtensions=".js" mandatory="true"/>
+		<field name="loglevel" type="list" default="DEBUG" values="script_loglevel"/>
+		<field name="runasrole" type="list" refs="role" values="generic_role"/>
+		<field name="status" type="list" default="TESTING" values="script_status"/>
 	</recordtype>
 	<recordtype name="shippingpartnersplugin">
 		<attribute name="scriptid" type="string" mandatory="true" length="40" default="customscript"/>
@@ -4146,7 +4292,7 @@
 		<feature>ADDRESSCUSTOMIZATION</feature>
 		<field name="name" type="string" mandatory="true"/>
 		<field name="addressTemplate" type="string" length="3990" mandatory="true"/>
-		<field name="countries" type="list" values="addressform_countries" multiple="true"/>
+		<field name="countries" type="list" values="countries" multiple="true"/>
 		<fragment name="mainFields" type="DEFAULT">
 			<fragment name="fieldGroup" type="COLLECTION">
 				<attribute name="scriptid" type="string" mandatory="true" length="99"/>
@@ -4275,13 +4421,13 @@
 		<field name="name" type="string" length="100" mandatory="true"/>
 		<field name="defaultlanguage" type="list" values="translationcollection_defaultlanguage" mandatory="true"/>
 		<field name="description" type="string" length="1000"/>
-		<fragment name="strings" type="COLLECTION">
-			<fragment name="string" type="DEFAULT">
-				<field name="key" type="string" length="60" mandatory="true"/>
+		<subrecordtypegroup name="strings">
+			<subrecordtype name="string">
+				<attribute name="scriptid" type="string" mandatory="true" length="60"/>
 				<field name="defaulttranslation" type="string" length="1000" mandatory="true"/>
 				<field name="description" type="string" length="1000"/>
-			</fragment>
-		</fragment>
+			</subrecordtype>
+		</subrecordtypegroup>
 	</recordtype>
 	<recordtype name="portlet">
 		<attribute name="scriptid" type="string" mandatory="true" length="40" default="customscript"/>
@@ -4411,13 +4557,18 @@
 		</subrecordtypegroup>
 	</recordtype>
 	<recordtype name="customtransactiontype">
-		<attribute name="scriptid" type="string" mandatory="true" length="40" default="customtransaction"/>
+		<attribute name="scriptid" type="string" mandatory="true" length="40"/>
 		<feature>CUSTOMTRANSACTIONS</feature>
 		<field name="name" type="string" length="96" mandatory="true"/>
-		<field name="subliststyle" type="list" default="BASIC" values="customtransactiontype_subliststyle" mandatory="true"/>
+		<field name="transactionstyle" type="list" default="BASIC" values="customtransactiontype_subliststyle"/>
+		<field name="subliststyle" type="list" default="BASIC" values="customtransactiontype_subliststyle">
+			<mandatoriness>
+				<condition dependson="customtransactiontype.transactionstyle" operation="UNDEFINED"/>
+			</mandatoriness>
+		</field>
 		<field name="iscredit" type="boolean" default="F">
 			<availability>
-				<condition dependson="customtransactiontype.subliststyle" operation="EQUALS" value="BASIC"/>
+				<condition dependson="customtransactiontype.transactionstyle" operation="IN" value="customtransactiontype_creditsupportstyles"/>
 			</availability>
 		</field>
 		<field name="isposting" type="boolean" default="F"/>
@@ -4431,26 +4582,74 @@
 				<field name="id" type="list" values="customtransactiontype_statuses_id" mandatory="true"/>
 			</subrecordtype>
 		</subrecordtypegroup>
+		<subrecordtypegroup name="permissions">
+			<subrecordtype name="permission">
+				<field name="permittedrole" type="list" refs="role" values="customrecordtype_permittedrole" mandatory="true"/>
+				<field name="permittedlevel" type="list" default="NONE" values="generic_permission_level" mandatory="true"/>
+			</subrecordtype>
+		</subrecordtypegroup>
 		<fragment name="segments" type="DEFAULT">
-			<field name="classposition" type="list" default="NONE" feature="CLASSES" values="customtransactiontype_classification_position"/>
+			<field name="classposition" type="list" default="NONE" feature="CLASSES" values="customtransactiontype_classification_position">
+				<availability>
+					<condition dependson="customtransactiontype.transactionstyle" operation="NOT_IN" value="customtransactiontype_subliststyle_salesandpurchase"/>
+				</availability>
+			</field>
 			<field name="isclassmandatory" type="boolean" default="F" feature="CLASSES">
 				<availability>
 					<condition dependson="customtransactiontype.segments.classposition" operation="NOT_EQUALS" value="NONE"/>
+					<condition dependson="customtransactiontype.transactionstyle" operation="NOT_IN" value="customtransactiontype_subliststyle_salesandpurchase"/>
 				</availability>
 			</field>
-			<field name="departmentposition" type="list" default="NONE" feature="DEPARTMENTS" values="customtransactiontype_classification_position"/>
+			<field name="departmentposition" type="list" default="NONE" feature="DEPARTMENTS" values="customtransactiontype_classification_position">
+				<availability>
+					<condition dependson="customtransactiontype.transactionstyle" operation="NOT_IN" value="customtransactiontype_subliststyle_salesandpurchase"/>
+				</availability>
+			</field>
 			<field name="isdepartmentmandatory" type="boolean" default="F" feature="DEPARTMENTS">
 				<availability>
 					<condition dependson="customtransactiontype.segments.departmentposition" operation="NOT_EQUALS" value="NONE"/>
+					<condition dependson="customtransactiontype.transactionstyle" operation="NOT_IN" value="customtransactiontype_subliststyle_salesandpurchase"/>
 				</availability>
 			</field>
-			<field name="locationposition" type="list" default="NONE" feature="LOCATIONS" values="customtransactiontype_classification_position"/>
+			<field name="locationposition" type="list" default="NONE" feature="LOCATIONS" values="customtransactiontype_classification_position">
+				<availability>
+					<condition dependson="customtransactiontype.transactionstyle" operation="NOT_IN" value="customtransactiontype_subliststyle_salesandpurchase"/>
+				</availability>
+			</field>
 			<field name="islocationmandatory" type="boolean" default="F" feature="LOCATIONS">
 				<availability>
 					<condition dependson="customtransactiontype.segments.locationposition" operation="NOT_EQUALS" value="NONE"/>
+					<condition dependson="customtransactiontype.transactionstyle" operation="NOT_IN" value="customtransactiontype_subliststyle_salesandpurchase"/>
 				</availability>
 			</field>
 		</fragment>
+		<fragment name="accounting" type="DEFAULT">
+			<field name="specifyaccountontransaction" type="boolean" default="F">
+				<availability>
+					<condition dependson="customtransactiontype.transactionstyle" operation="IN" value="customtransactiontype_subliststyle_salesandpurchase"/>
+				</availability>
+			</field>
+			<field name="filterbyaccounttypeall" type="boolean" default="F">
+				<availability>
+					<condition dependson="customtransactiontype.accounting.specifyaccountontransaction" operation="EQUALS" value="T"/>
+				</availability>
+			</field>
+			<field name="filterbyaccounttype" type="list" values="customtransactiontype_filterbyaccounttype">
+				<availability>
+					<condition dependson="customtransactiontype.accounting.specifyaccountontransaction" operation="EQUALS" value="T"/>
+					<condition dependson="customtransactiontype.accounting.filterbyaccounttypeall" operation="EQUALS" value="F"/>
+				</availability>
+			</field>
+		</fragment>
+	</recordtype>
+	<recordtype name="workbook">
+		<attribute name="scriptid" type="string" mandatory="true" length="99" default="custworkbook"/>
+		<feature>USR</feature>
+		<field name="name" type="string" length="50" mandatory="true"/>
+		<field name="definition" type="string" mandatory="true"/>
+		<fieldset name="dependencies">
+			<field name="dependency" type="list" refs="dataset" refsonly="true" mandatory="true"/>
+		</fieldset>
 	</recordtype>
 	<recordtype name="consolidatedrateadjustorplugin">
 		<attribute name="scriptid" type="string" mandatory="true" length="40" default="customscript"/>
@@ -4937,7 +5136,7 @@
 				</fragment>
 				<fragment name="subItems" type="COLLECTION">
 					<fragment name="subList" type="DEFAULT">
-						<field name="id" type="list" refs="customrecordtype.customrecordcustomfields.customrecordcustomfield,customrecordtype.recordsublists.recordsublist" values="transactionform_sublistid" mandatory="true"/>
+						<field name="id" type="list" values="transactionform_sublistid" mandatory="true"/>
 						<field name="label" type="string"/>
 						<field name="visible" type="boolean" default="T"/>
 						<fragment name="columns" type="COLLECTION">
@@ -4996,7 +5195,7 @@
 					</fragment>
 					<fragment name="subLists" type="COLLECTION">
 						<fragment name="subList" type="DEFAULT">
-							<field name="id" type="list" refs="customrecordtype.customrecordcustomfields.customrecordcustomfield,customrecordtype.recordsublists.recordsublist" values="transactionform_sublistid" mandatory="true"/>
+							<field name="id" type="list" values="transactionform_sublistid" mandatory="true"/>
 							<field name="label" type="string" mandatory="true"/>
 							<field name="visible" type="boolean" default="T"/>
 						</fragment>
@@ -5004,13 +5203,16 @@
 				</fragment>
 			</fragment>
 		</fragment>
+		<fragment name="customCode" type="DEFAULT">
+			<field name="scriptFile" type="filereference" accountspecific="conditional" allowedFileExtensions=".js"/>
+		</fragment>
 		<fragment name="quickViewFields" type="COLLECTION">
 			<fragment name="field" type="DEFAULT">
 				<field name="id" type="list" refs="crmcustomfield,customrecordtype.customrecordcustomfields.customrecordcustomfield,entitycustomfield,itemcustomfield,itemnumbercustomfield,itemoptioncustomfield,othercustomfield,transactionbodycustomfield,transactioncolumncustomfield" values="transactionform_fieldid" mandatory="true"/>
 			</fragment>
 		</fragment>
 		<fragment name="buttons" type="DEFAULT">
-			<fragment name="standardButtons" type="DEFAULT">
+			<fragment name="standardButtons" type="COLLECTION">
 				<fragment name="button" type="DEFAULT">
 					<field name="id" type="list" values="transactionform_buttonid" mandatory="true"/>
 					<field name="label" type="string"/>
@@ -5027,11 +5229,23 @@
 					<field name="visible" type="boolean" default="T"/>
 				</fragment>
 			</fragment>
+			<fragment name="customButtons" type="COLLECTION">
+				<fragment name="customButton" type="DEFAULT">
+					<field name="label" type="string" length="99" mandatory="true"/>
+					<field name="function" type="string" length="200"/>
+				</fragment>
+			</fragment>
 			<fragment name="menu" type="COLLECTION">
 				<fragment name="menuitem" type="DEFAULT">
 					<field name="id" type="list" values="transactionform_buttonid" mandatory="true"/>
 					<field name="label" type="string" length="40"/>
 					<field name="visible" type="boolean" default="T"/>
+				</fragment>
+			</fragment>
+			<fragment name="customMenu" type="COLLECTION">
+				<fragment name="customMenuItem" type="DEFAULT">
+					<field name="label" type="string" length="99" mandatory="true"/>
+					<field name="function" type="string" length="200"/>
 				</fragment>
 			</fragment>
 		</fragment>
@@ -5116,6 +5330,15 @@
 		<field name="savedsearch" type="list" feature="SERVERSIDESCRIPTING" refs="savedsearch"/>
 		<field name="recordtype" type="list" refs="customrecordtype,customtransactiontype"/>
 		<datafile name="template" extension="template.xml" mandatory="true" mimetype="text/xml"/>
+	</recordtype>
+	<recordtype name="dataset">
+		<attribute name="scriptid" type="string" mandatory="true" length="99" default="custdataset"/>
+		<feature>USR</feature>
+		<field name="name" type="string" length="50" mandatory="true"/>
+		<field name="definition" type="string" mandatory="true"/>
+		<fieldset name="dependencies">
+			<field name="dependency" type="list" refs="crmcustomfield,customrecordtype,customrecordtype.customrecordcustomfields.customrecordcustomfield,customsegment,customtransactiontype,entitycustomfield,itemcustomfield,itemnumbercustomfield,itemoptioncustomfield,othercustomfield,transactionbodycustomfield,transactioncolumncustomfield" refsonly="true" mandatory="true"/>
+		</fieldset>
 	</recordtype>
 	<recordtype name="usereventscript">
 		<attribute name="scriptid" type="string" mandatory="true" length="40" default="customscript"/>
@@ -5208,7 +5431,13 @@
 				<field name="loglevel" type="list" default="DEBUG" values="script_loglevel"/>
 				<field name="runasrole" type="list" refs="role" values="generic_role"/>
 				<field name="status" type="list" default="TESTING" values="script_status" mandatory="true"/>
-				<field name="executeinwebstore" type="boolean" default="F"/>
+				<field name="alllocalizationcontexts" type="boolean" default="T"/>
+				<field name="executioncontext" type="list" values="execution_context" multiple="true"/>
+				<field name="localizationcontext" type="list" values="countries" multiple="true">
+					<availability>
+						<condition dependson="alllocalizationcontexts" operation="EQUALS" value="F"/>
+					</availability>
+				</field>
 				<field name="recordtype" type="list" refs="customrecordtype,customtransactiontype" values="generic_standard_recordtype,allrecord_script_deployment_recordtype" mandatory="true"/>
 				<customfield instancetype="usereventscript.scriptcustomfields.scriptcustomfield" fromparentonly="true"/>
 			</subrecordtype>
@@ -5233,7 +5462,7 @@
 	</group>
 	<preference>
 		<projecttype values="SUITEAPP"/>
-		<attribute name="type" type="string" value="HIDING"/>
+		<attribute name="type" value="HIDING"/>
 		<attribute name="defaultAction" type="list" values="hiding_actions"/>
 		<apply>
 			<attribute name="action" type="list" values="hiding_actions"/>
@@ -5245,11 +5474,11 @@
 	</preference>
 	<preference>
 		<projecttype values="SUITEAPP"/>
-		<attribute name="type" type="string" value="LOCKING"/>
+		<attribute name="type" value="LOCKING"/>
 		<attribute name="defaultAction" type="list" values="locking_actions"/>
 		<apply>
 			<attribute name="action" type="list" values="locking_actions"/>
-			<allowedtype name="object" type="OBJECT" refs="addressForm,advancedrevrecplugin,bundleinstallationscript,clientscript,cmscontenttype,consolidatedrateadjustorplugin,crmcustomfield,customglplugin,customlist,customrecordtype,customsegment,emailcaptureplugin,entitycustomfield,entryform,itemcustomfield,itemnumbercustomfield,itemoptioncustomfield,mapreducescript,massupdatescript,othercustomfield,paymentgatewayplugin,platformextensionplugin,plugintype,plugintypeimpl,portlet,promotionsplugin,restlet,role,savedsearch,scheduledscript,sdfinstallationscript,shippingpartnersplugin,suitelet,taxcalculationplugin,transactionbodycustomfield,transactioncolumncustomfield,transactionform,translationcollection,usereventscript,webapp,workflow,workflowactionscript"/>
+			<allowedtype name="object" type="OBJECT" refs="addressForm,advancedrevrecplugin,bankstatementparserplugin,bundleinstallationscript,clientscript,cmscontenttype,consolidatedrateadjustorplugin,crmcustomfield,customglplugin,customlist,customrecordtype,customsegment,emailcaptureplugin,entitycustomfield,entryForm,ficonnectivityplugin,itemcustomfield,itemnumbercustomfield,itemoptioncustomfield,mapreducescript,massupdatescript,othercustomfield,paymentgatewayplugin,platformextensionplugin,plugintype,plugintypeimpl,portlet,promotionsplugin,restlet,role,savedsearch,scheduledscript,sdfinstallationscript,shippingpartnersplugin,sspapplication,suitelet,taxcalculationplugin,transactionForm,transactionbodycustomfield,transactioncolumncustomfield,translationcollection,usereventscript,workflow,workflowactionscript"/>
 			<allowedtype name="path" type="FILE"/>
 			<allowedtype name="path" type="FILES">
 				<attribute name="appliesTo" type="string"/>
